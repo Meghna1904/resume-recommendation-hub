@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import { ResumeViewer } from '../ResumeViewer';
+import { ResumeViewer } from '../../components/ResumeViewer';
 
 interface ResumePreviewSectionProps {
   file: File | null;

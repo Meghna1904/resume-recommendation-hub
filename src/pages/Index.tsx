@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Navigation } from '@/components/Navigation';
@@ -10,7 +11,7 @@ import { ResumeData } from '@/utils/resumeParser';
 import { getJobMatches, getJobAnalysis } from '@/utils/api';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BriefcaseIcon, ChevronDownIcon, FilterIcon } from 'lucide-react';
+import { BriefcaseIcon, ChevronDownIcon, FilterIcon, Loader2 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
 const Index = () => {
