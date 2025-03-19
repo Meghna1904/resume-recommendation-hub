@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Navigation } from '@/components/Navigation';
 import { Hero } from '@/components/Hero';
@@ -8,32 +7,59 @@ import { JobCard, Job } from '@/components/JobCard';
 import { SkillMatch } from '@/components/SkillMatch';
 import { Footer } from '@/components/Footer';
 import { ResumeData } from '@/utils/resumeParser';
-import { findMatchingJobs, getJobSkillsAnalysis } from '@/utils/jobMatcher';
+import { getJobMatches, getJobAnalysis } from '@/utils/api';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BriefcaseIcon, ChevronDownIcon, FilterIcon } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
 
 const Index = () => {
   const [resumeData, setResumeData] = useState<ResumeData | null>(null);
   const [matchingJobs, setMatchingJobs] = useState<Job[]>([]);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
   
-  const handleResumeProcessed = (data: ResumeData) => {
+  const handleResumeProcessed = async (data: ResumeData) => {
     setResumeData(data);
+    setIsLoading(true);
     
-    // Find matching jobs
-    const jobs = findMatchingJobs(data);
-    setMatchingJobs(jobs);
-    
-    // Select the first job by default
-    if (jobs.length > 0) {
-      setSelectedJob(jobs[0]);
+    try {
+      const jobs = await getJobMatches(data);
+      setMatchingJobs(jobs);
+      
+      if (jobs.length > 0) {
+        setSelectedJob(jobs[0]);
+      }
+      
+      setTimeout(() => {
+        document.getElementById('job-matches')?.scrollIntoView({ behavior: 'smooth' });
+      }, 500);
+    } catch (error) {
+      console.error('Error fetching job matches:', error);
+      toast({
+        title: "Error finding job matches",
+        description: "Something went wrong while finding matching jobs. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
+  };
+  
+  const handleJobSelection = async (job: Job) => {
+    if (!resumeData) return;
     
-    // Scroll to jobs section
-    setTimeout(() => {
-      document.getElementById('job-matches')?.scrollIntoView({ behavior: 'smooth' });
-    }, 500);
+    setSelectedJob(job);
+    
+    try {
+      const jobAnalysis = await getJobAnalysis(job.id, resumeData);
+      
+      // Update the job with additional analysis if needed
+      // This might depend on your backend implementation
+    } catch (error) {
+      console.error('Error fetching job analysis:', error);
+    }
   };
   
   return (
@@ -75,19 +101,26 @@ const Index = () => {
                     </Button>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    {matchingJobs.map((job, index) => (
-                      <div 
-                        key={job.id}
-                        onClick={() => setSelectedJob(job)}
-                        className={`cursor-pointer transition-all duration-200 ${
-                          selectedJob?.id === job.id ? 'ring-2 ring-primary ring-offset-2' : ''
-                        }`}
-                      >
-                        <JobCard job={job} index={index} />
-                      </div>
-                    ))}
-                  </div>
+                  {isLoading ? (
+                    <div className="flex justify-center items-center py-12">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                      <span className="ml-2 text-lg">Finding matching jobs...</span>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                      {matchingJobs.map((job, index) => (
+                        <div 
+                          key={job.id}
+                          onClick={() => handleJobSelection(job)}
+                          className={`cursor-pointer transition-all duration-200 ${
+                            selectedJob?.id === job.id ? 'ring-2 ring-primary ring-offset-2' : ''
+                          }`}
+                        >
+                          <JobCard job={job} index={index} />
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 
                 <div className="lg:w-1/3">
@@ -112,7 +145,7 @@ const Index = () => {
                           <TabsContent value="match">
                             {resumeData && (
                               <SkillMatch 
-                                skills={getJobSkillsAnalysis(selectedJob, resumeData)} 
+                                skills={selectedJob.skillAnalysis || []} 
                                 resumeSkills={resumeData.skills}
                               />
                             )}

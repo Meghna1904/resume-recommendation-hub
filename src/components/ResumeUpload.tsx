@@ -3,7 +3,6 @@ import { useState, useRef } from 'react';
 import { Upload, Check, X, FileText, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { parseResume } from '@/utils/resumeParser';
 import { toast } from '@/components/ui/use-toast';
 
 interface ResumeUploadProps {
@@ -81,11 +80,21 @@ export function ResumeUpload({ onResumeProcessed }: ResumeUploadProps) {
     }, 200);
     
     try {
-      // Here we would normally upload the file to a server
-      // Instead we'll use our local parser for demo purposes
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API delay
+      // Create FormData object to send file to backend
+      const formData = new FormData();
+      formData.append('resume', file);
       
-      const resumeData = await parseResume(file);
+      // Send the file to the Flask backend
+      const response = await fetch('http://localhost:5000/api/parse-resume', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Server responded with status: ${response.status}`);
+      }
+      
+      const resumeData = await response.json();
       onResumeProcessed(resumeData);
       
       toast({
