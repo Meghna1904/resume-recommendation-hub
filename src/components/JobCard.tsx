@@ -1,3 +1,4 @@
+
 import { motion } from 'framer-motion';
 import { Briefcase, MapPin, Clock, DollarSign, Star, BookOpen } from 'lucide-react';
 
@@ -12,13 +13,6 @@ export interface Job {
   postedDate: string;
   matchScore: number;
   skills: string[];
-  skillAnalysis?: {
-    name: string;
-    matched: boolean;
-    importance: 'high' | 'medium' | 'low';
-  }[];
-  source?: string;  // Added for when jobs come from different sources
-  applyUrl?: string; // URL to apply for the job
 }
 
 interface JobCardProps {

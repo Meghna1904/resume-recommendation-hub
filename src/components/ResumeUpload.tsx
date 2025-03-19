@@ -1,17 +1,16 @@
+
 import { useState, useRef } from 'react';
 import { Upload, Check, X, FileText, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { parseResume } from '@/utils/resumeParser';
 import { toast } from '@/components/ui/use-toast';
-import { parseResumeWithAPI } from '@/utils/api';
-import { parseResumeWithNLP, convertNlpToAppFormat } from '@/utils/resumeNlpParser';
 
 interface ResumeUploadProps {
   onResumeProcessed: (resumeData: any) => void;
-  useNLP?: boolean;
 }
 
-export function ResumeUpload({ onResumeProcessed, useNLP = false }: ResumeUploadProps) {
+export function ResumeUpload({ onResumeProcessed }: ResumeUploadProps) {
   const [file, setFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -82,17 +81,11 @@ export function ResumeUpload({ onResumeProcessed, useNLP = false }: ResumeUpload
     }, 200);
     
     try {
-      let resumeData;
+      // Here we would normally upload the file to a server
+      // Instead we'll use our local parser for demo purposes
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API delay
       
-      if (useNLP) {
-        // Use the NLP parser
-        const nlpData = await parseResumeWithNLP(file);
-        resumeData = convertNlpToAppFormat(nlpData);
-      } else {
-        // Use the regular parser
-        resumeData = await parseResumeWithAPI(file);
-      }
-      
+      const resumeData = await parseResume(file);
       onResumeProcessed(resumeData);
       
       toast({

@@ -20,9 +20,6 @@ export interface ResumeData {
     location: string;
     graduationDate: string;
   }[];
-  parsedText: string;
-  emails?: string[];
-  phone_numbers?: string[];
 }
 
 /**
@@ -101,9 +98,6 @@ export const parseResume = async (file: File): Promise<ResumeData> => {
         location: "San Francisco, CA",
         graduationDate: "August 2015"
       }
-    ],
-    parsedText: "Alex Johnson\nSenior Frontend Developer\n\nContact: alex.johnson@example.com | (555) 123-4567\nLocation: San Francisco, CA\n\nSummary\nExperienced software engineer with 5+ years of experience in frontend development, specializing in React, TypeScript, and responsive web design. Passionate about creating intuitive user experiences and optimizing application performance.\n\nExperience\nSenior Frontend Developer - TechCorp Inc., San Francisco, CA (Jan 2021 - Present)\nLead frontend development for e-commerce platform serving 500k+ monthly users. Implemented performance optimizations resulting in 40% improvement in load times. Mentored junior developers and established frontend best practices.\n\nFrontend Developer - WebSolutions LLC, Oakland, CA (Mar 2018 - Dec 2020)\nDeveloped responsive web applications for clients across various industries. Worked with a team of designers and backend developers to deliver full-stack solutions. Specialized in React and state management solutions.\n\nJunior Web Developer - Creative Digital Agency, Berkeley, CA (Jun 2016 - Feb 2018)\nBuilt and maintained websites for small businesses and startups. Responsible for implementing designs, integrating content management systems, and ensuring cross-browser compatibility.\n\nEducation\nB.S. Computer Science - University of California, Berkeley (May 2016)\nFrontend Web Development Certification - Coding Bootcamp, San Francisco, CA (August 2015)",
-    emails: ["alex.johnson@example.com"],
-    phone_numbers: ["(555) 123-4567"]
+    ]
   };
 };
