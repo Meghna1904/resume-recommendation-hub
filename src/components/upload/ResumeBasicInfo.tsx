@@ -16,11 +16,15 @@ const ResumeBasicInfo: React.FC<ResumeBasicInfoProps> = ({ resumeData }) => {
         </div>
         <div>
           <p className="text-sm text-gray-500">Email</p>
-          <p className="font-medium">{resumeData.emails?.[0] || resumeData.email || 'Not provided'}</p>
+          <p className="font-medium">
+            {resumeData.emails?.[0] || resumeData.email || 'Not provided'}
+          </p>
         </div>
         <div>
           <p className="text-sm text-gray-500">Contact</p>
-          <p className="font-medium">{resumeData.phone_numbers?.[0] || resumeData.phone || 'Not provided'}</p>
+          <p className="font-medium">
+            {resumeData.phone_numbers?.[0] || resumeData.phone || 'Not provided'}
+          </p>
         </div>
       </div>
     </div>

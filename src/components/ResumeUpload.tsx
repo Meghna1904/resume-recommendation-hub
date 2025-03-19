@@ -1,15 +1,17 @@
-
 import { useState, useRef } from 'react';
 import { Upload, Check, X, FileText, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
+import { parseResumeWithAPI } from '@/utils/api';
+import { parseResumeWithNLP, convertNlpToAppFormat } from '@/utils/resumeNlpParser';
 
 interface ResumeUploadProps {
   onResumeProcessed: (resumeData: any) => void;
+  useNLP?: boolean;
 }
 
-export function ResumeUpload({ onResumeProcessed }: ResumeUploadProps) {
+export function ResumeUpload({ onResumeProcessed, useNLP = false }: ResumeUploadProps) {
   const [file, setFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -80,21 +82,17 @@ export function ResumeUpload({ onResumeProcessed }: ResumeUploadProps) {
     }, 200);
     
     try {
-      // Create FormData object to send file to backend
-      const formData = new FormData();
-      formData.append('resume', file);
+      let resumeData;
       
-      // Send the file to the Flask backend
-      const response = await fetch('http://localhost:5000/api/parse-resume', {
-        method: 'POST',
-        body: formData,
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Server responded with status: ${response.status}`);
+      if (useNLP) {
+        // Use the NLP parser
+        const nlpData = await parseResumeWithNLP(file);
+        resumeData = convertNlpToAppFormat(nlpData);
+      } else {
+        // Use the regular parser
+        resumeData = await parseResumeWithAPI(file);
       }
       
-      const resumeData = await response.json();
       onResumeProcessed(resumeData);
       
       toast({
